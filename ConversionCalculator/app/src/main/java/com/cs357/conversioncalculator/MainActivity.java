@@ -15,12 +15,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.cs357.conversioncalculator.dummy.HistoryContent;
+
+import org.joda.time.DateTime;
+
 public class MainActivity extends AppCompatActivity
 {
     public static final int SETTINGS_SELECTION = 1;
+    public static final int HISTORY_RESULT = 2;
     public int UNIT_SELECTION = 1; // 1 for length, 2 for volume
     public TextView toUnit;
     public TextView fromUnit;
+    public EditText toValue;
+    public EditText fromValue;
+    public TextView title;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,12 +39,13 @@ public class MainActivity extends AppCompatActivity
 
         getSupportActionBar().setTitle("Conversion Calculator"); // for set actionbar title
 
-        final TextView title = (TextView) findViewById(R.id.title);
 
         toUnit = (TextView) findViewById(R.id.toUnit);
         fromUnit = (TextView) findViewById(R.id.fromUnit);
-        final EditText toValue = (EditText) findViewById(R.id.toValue);
-        final EditText fromValue = (EditText) findViewById(R.id.fromValue);
+        toValue = (EditText) findViewById(R.id.toValue);
+        fromValue = (EditText) findViewById(R.id.fromValue);
+        title = (TextView) findViewById(R.id.title);
+
 
         final Button calculate = findViewById(R.id.calculate);
         calculate.setOnClickListener(new View.OnClickListener()
@@ -50,6 +60,11 @@ public class MainActivity extends AppCompatActivity
                                 Double.parseDouble(fromValue.getText().toString()),
                                 UnitsConverter.LengthUnits.valueOf(fromUnit.getText().toString()),
                                 UnitsConverter.LengthUnits.valueOf(toUnit.getText().toString()))));
+
+                        HistoryContent.HistoryItem item = new HistoryContent.HistoryItem(
+                                Double.valueOf(fromValue.getText().toString()), Double.valueOf(toValue.getText().toString()), "Length Converter",
+                                toUnit.getText().toString(), fromUnit.getText().toString(), DateTime.now());
+                        HistoryContent.addItem(item);
                     }
                     else if (title.getText().equals("Volume Converter"))
                     {
@@ -57,6 +72,10 @@ public class MainActivity extends AppCompatActivity
                                 Double.parseDouble(fromValue.getText().toString()),
                                 UnitsConverter.VolumeUnits.valueOf(fromUnit.getText().toString()),
                                 UnitsConverter.VolumeUnits.valueOf(toUnit.getText().toString()))));
+                        HistoryContent.HistoryItem item = new HistoryContent.HistoryItem(
+                                Double.valueOf(fromValue.getText().toString()), Double.valueOf(toValue.getText().toString()), "Volume Converter",
+                                toUnit.getText().toString(), fromUnit.getText().toString(), DateTime.now());
+                        HistoryContent.addItem(item);
                     }
                 }
                 hideSoftKeyboard(v);
@@ -88,6 +107,8 @@ public class MainActivity extends AppCompatActivity
                     UNIT_SELECTION = 2;
                     toUnit.setText(getString(R.string.gallons));
                     fromUnit.setText(getString(R.string.liters));
+
+
                 }
                 else if (title.getText().equals("Volume Converter"))
                 {
@@ -98,6 +119,8 @@ public class MainActivity extends AppCompatActivity
                     toUnit.setText(getString(R.string.meters));
                     fromUnit.setText(getString(R.string.yards));
                 }
+
+
 
                 hideSoftKeyboard(v);
 
@@ -125,6 +148,10 @@ public class MainActivity extends AppCompatActivity
                 intentSettings.putExtras(extras);
                 startActivityForResult(intentSettings, SETTINGS_SELECTION);
                 return true;
+            case R.id.action_history:
+                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                startActivityForResult(intent, HISTORY_RESULT );
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -138,7 +165,16 @@ public class MainActivity extends AppCompatActivity
                 Bundle b = data.getExtras();
                 toUnit.setText(b.getString("toSelection"));
                 fromUnit.setText(b.getString("fromSelection"));
+            }else if (resultCode == HISTORY_RESULT) {
+                String[] vals = data.getStringArrayExtra("item");
+                this.fromValue.setText(vals[0]);
+                this.toValue.setText(vals[1]);
+                System.out.println("TESTING" + vals[2]);
+                this.fromUnit.setText(vals[3]);
+                this.toUnit.setText(vals[4]);
+//                this.title.setText(mode.toString() + " Converter");
             }
+
         }
 
 
