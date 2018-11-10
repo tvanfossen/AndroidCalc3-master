@@ -8,10 +8,22 @@ import java.util.List;
 import java.util.Map;
 
 public class HistoryContent {
+
+
+
+
     public static final List<HistoryItem> ITEMS = new ArrayList<HistoryItem>();
 
     public static void addItem(HistoryItem item) {
         ITEMS.add(item);
+    }
+
+    static {
+        DateTime now = DateTime.now();
+        addItem(new HistoryItem(2.0, 1.829, "Length", "Yards", "Meters", DateTime.now().minusDays(1)));
+        addItem(new HistoryItem(1.0, 3.785, "Volume", "Gallons", "Liters", DateTime.now().minusDays(1)));
+        addItem(new HistoryItem(2.0, 1.829, "Length", "Yards", "Meters", DateTime.now().plusDays(1)));
+        addItem(new HistoryItem(1.0, 3.785, "Volume", "Gallons", "Liters", DateTime.now().plusDays(1)));
     }
 
     public static class HistoryItem {
@@ -31,6 +43,8 @@ public class HistoryContent {
             this.fromUnits = fromUnits;
             this.toUnits = toUnits;
             this.timestamp = timestamp;
+
+
         }
 
         @Override
